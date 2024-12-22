@@ -2,10 +2,24 @@ import { AnswersRepository } from "@/domain/forum/application/repositories/answe
 import { Answer } from "@/domain/forum/enterprise/entities/answer";
 
 export class InMemoryAnswersRepository implements AnswersRepository {
-  public Answers: Answer[] = [];
+  public items: Answer[] = [];
+
+  async findById(answerId: string) {
+    return this.items.find((item) => item.id.toString() === answerId) ?? null;
+  }
 
   async create(answer: Answer) {
-    this.Answers.push(answer);
+    this.items.push(answer);
+
+    return answer;
+  }
+
+  async delete(answerId: string) {
+    const index = this.items.findIndex(
+      (item) => item.id.toString() === answerId
+    );
+
+    this.items.splice(index, 1);
   }
 }
 
