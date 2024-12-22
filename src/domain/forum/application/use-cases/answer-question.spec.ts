@@ -1,27 +1,30 @@
 import { UniqueEntityId } from "@/core/entities/unique-entity-id";
-import { Answer } from "../../enterprise/entities/answer";
-import { AnswersRepository } from "../repositories/answers-repository";
-import { answerQuestionUseCase } from "./answer-question";
+import { AnswerQuestionUseCase } from "./answer-question";
+import { InMemoryAnswersRepository } from "test/repositories/in-memory-answers-repository";
 
-const fakeAnswerRepository: AnswersRepository = {
-  create: async (answer: Answer) => {},
-};
+let inMemoryAnswersRepository: InMemoryAnswersRepository;
+let sut: AnswerQuestionUseCase;
 
-it("should be able to create a new answer", async () => {
-  const sut = new answerQuestionUseCase(fakeAnswerRepository);
-
-  const answer = await sut.execute({
-    authorId: "author-test",
-    questionId: "question-test",
-    content: "Testing answer creation.",
+describe("Answer question use case", () => {
+  beforeEach(async () => {
+    inMemoryAnswersRepository = new InMemoryAnswersRepository();
+    sut = new AnswerQuestionUseCase(inMemoryAnswersRepository);
   });
 
-  expect(answer.props).toEqual(
-    expect.objectContaining({
-      authorId: new UniqueEntityId("author-test"),
-      questionId: new UniqueEntityId("question-test"),
+  it("should be able to create a new answer", async () => {
+    const { answer } = await sut.execute({
+      authorId: "author-test",
+      questionId: "question-test",
       content: "Testing answer creation.",
-    })
-  );
+    });
+
+    expect(answer.props).toEqual(
+      expect.objectContaining({
+        authorId: new UniqueEntityId("author-test"),
+        questionId: new UniqueEntityId("question-test"),
+        content: "Testing answer creation.",
+      })
+    );
+  });
 });
 

@@ -2,16 +2,22 @@ import { UniqueEntityId } from "@/core/entities/unique-entity-id";
 import { Answer } from "../../enterprise/entities/answer";
 import { AnswersRepository } from "../repositories/answers-repository";
 
-interface AnswerQuestionUseCaseProps {
+interface AnswerQuestionUseCaseRequest {
   authorId: string;
   questionId: string;
   content: string;
 }
 
-export class answerQuestionUseCase {
+interface AnswerQuestionUseCaseResponse {
+  answer: Answer;
+}
+
+export class AnswerQuestionUseCase {
   constructor(private repository: AnswersRepository) {}
 
-  async execute(props: AnswerQuestionUseCaseProps) {
+  async execute(
+    props: AnswerQuestionUseCaseRequest
+  ): Promise<AnswerQuestionUseCaseResponse> {
     const answer = Answer.create({
       authorId: new UniqueEntityId(props.authorId),
       questionId: new UniqueEntityId(props.questionId),
@@ -20,7 +26,7 @@ export class answerQuestionUseCase {
 
     await this.repository.create(answer);
 
-    return answer;
+    return { answer };
   }
 }
 

@@ -4,9 +4,9 @@ import { Slug } from "./value-objects/slug";
 import { Optional } from "@/core/types/optional";
 import dayjs from "dayjs";
 
-interface QuestionProps {
+export interface QuestionProps {
   authorId: UniqueEntityId;
-  bestAnswerId: UniqueEntityId;
+  bestAnswerId?: UniqueEntityId;
   title: string;
   content: string;
   slug: Slug;
@@ -16,13 +16,17 @@ interface QuestionProps {
 
 export class Question extends Entity<QuestionProps> {
   static create(
-    props: Optional<QuestionProps, "createdAt" | "slug">
+    props: Optional<QuestionProps, "createdAt" | "slug">,
+    id?: UniqueEntityId
   ): Question {
-    return new Question({
-      ...props,
-      slug: props.slug ?? Slug.createFromText(props.title),
-      createdAt: props.createdAt ?? new Date(),
-    });
+    return new Question(
+      {
+        ...props,
+        slug: props.slug ?? Slug.createFromText(props.title),
+        createdAt: props.createdAt ?? new Date(),
+      },
+      id
+    );
   }
 
   get authorId() {

@@ -1,8 +1,12 @@
 export class Slug {
   public value: string;
 
-  constructor(value: string) {
+  private constructor(value: string) {
     this.value = value;
+  }
+
+  static create(value: string) {
+    return new Slug(value);
   }
 
   /**
@@ -25,3 +29,4 @@ export class Slug {
     return new Slug(slugText);
   }
 }
+
