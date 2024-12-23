@@ -5,26 +5,26 @@ import { FetchRecentQuestionsUseCase } from "./fetch-recent-questions";
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
 let sut: FetchRecentQuestionsUseCase;
 
-describe("Fetch recent questions case", () => {
+describe("Fetch recent questions use case", () => {
   beforeEach(async () => {
     inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
     sut = new FetchRecentQuestionsUseCase(inMemoryQuestionsRepository);
   });
 
   it("should be able to fetch the recent questions.", async () => {
-    inMemoryQuestionsRepository.create(
+    await inMemoryQuestionsRepository.create(
       makeQuestion({
         createdAt: new Date(2024, 11, 10),
       })
     );
 
-    inMemoryQuestionsRepository.create(
+    await inMemoryQuestionsRepository.create(
       makeQuestion({
         createdAt: new Date(2024, 11, 22),
       })
     );
 
-    inMemoryQuestionsRepository.create(
+    await inMemoryQuestionsRepository.create(
       makeQuestion({
         createdAt: new Date(2024, 11, 5),
       })
@@ -41,7 +41,7 @@ describe("Fetch recent questions case", () => {
 
   it("should be able to fetch paginated recent questions.", async () => {
     for (let i = 0; i < 23; i++) {
-      inMemoryQuestionsRepository.create(makeQuestion());
+      await inMemoryQuestionsRepository.create(makeQuestion());
     }
 
     const { questions } = await sut.execute({
