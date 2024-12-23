@@ -33,8 +33,8 @@ export class Question extends Entity<QuestionProps> {
     return this.props.authorId;
   }
 
-  get bestAnswerId() {
-    return this.props.bestAnswerId;
+  get bestAnswerId(): UniqueEntityId | null {
+    return this.props.bestAnswerId ?? null;
   }
 
   get title() {
@@ -77,6 +77,11 @@ export class Question extends Entity<QuestionProps> {
 
   set content(content: string) {
     this.props.content = content;
+    this.touch();
+  }
+
+  set bestAnswerId(bestAnswerId: UniqueEntityId) {
+    this.props.bestAnswerId = bestAnswerId;
     this.touch();
   }
 
