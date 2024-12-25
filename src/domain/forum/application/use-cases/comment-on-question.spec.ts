@@ -1,7 +1,9 @@
-import { UniqueEntityId } from "@/core/entities/unique-entity-id";
+import { makeQuestion } from "test/factories/make-question";
 import { CommentOnQuestionUseCase } from "./comment-on-question";
 import { InMemoryQuestionCommentsRepository } from "test/repositories/in-memory-question-comments-repository";
+import { InMemoryQuestionsRepository } from "test/repositories/in-memory-questions-repository";
 
+let inMemoryQuestionsRepository: InMemoryQuestionsRepository;
 let inMemoryQuestionCommentsRepository: InMemoryQuestionCommentsRepository;
 let sut: CommentOnQuestionUseCase;
 
@@ -9,23 +11,32 @@ describe("QuestionComment question use case", () => {
   beforeEach(async () => {
     inMemoryQuestionCommentsRepository =
       new InMemoryQuestionCommentsRepository();
-    sut = new CommentOnQuestionUseCase(inMemoryQuestionCommentsRepository);
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository();
+    sut = new CommentOnQuestionUseCase(
+      inMemoryQuestionsRepository,
+      inMemoryQuestionCommentsRepository
+    );
   });
 
   it("should be able to create a new question comment", async () => {
-    const { questionComment } = await sut.execute({
+    const question = makeQuestion();
+    await inMemoryQuestionsRepository.create(question);
+
+    const result = await sut.execute({
       authorId: "author-test",
-      questionId: "question-test",
+      questionId: question.id.toString(),
       content: "Testing question comment creation.",
     });
 
-    expect(questionComment.props).toEqual(
-      expect.objectContaining({
-        authorId: new UniqueEntityId("author-test"),
-        questionId: new UniqueEntityId("question-test"),
-        content: "Testing question comment creation.",
-      })
-    );
+    const success = result.isRight();
+
+    expect(success).toBe(true);
+
+    if (success) {
+      expect(result.value.questionComment).toEqual(
+        inMemoryQuestionCommentsRepository.items[0]
+      );
+    }
   });
 });
 

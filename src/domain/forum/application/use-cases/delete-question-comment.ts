@@ -1,12 +1,17 @@
+import { Either, left, right } from "@/core/either";
 import { QuestionCommentsRepository } from "../repositories/question-comments-repository";
+import { NotAllowedError } from "./errors/not-allowed-error";
+import { ResourceNotFoundError } from "./errors/resource-not-found-error";
 
 interface DeleteQuestionCommentUseCaseRequest {
   questionCommentId: string;
   authorId: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface DeleteQuestionCommentUseCaseResponse {}
+type DeleteQuestionCommentUseCaseResponse = Either<
+  ResourceNotFoundError | NotAllowedError,
+  object
+>;
 
 export class DeleteQuestionCommentUseCase {
   constructor(private repository: QuestionCommentsRepository) {}
@@ -18,16 +23,15 @@ export class DeleteQuestionCommentUseCase {
     const questionComment = await this.repository.findById(questionCommentId);
 
     if (!questionComment) {
-      throw new Error("Question comment not found");
+      return left(new ResourceNotFoundError());
     }
 
     if (questionComment.authorId.toString() !== authorId) {
-      throw new Error("Unauthorized");
+      return left(new NotAllowedError());
     }
 
     await this.repository.delete(questionCommentId);
 
-    return {};
+    return right({});
   }
 }
-

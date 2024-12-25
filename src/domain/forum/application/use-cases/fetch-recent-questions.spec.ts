@@ -30,13 +30,20 @@ describe("Fetch recent questions use case", () => {
       })
     );
 
-    const { questions } = await sut.execute({
+    const result = await sut.execute({
       page: 1,
     });
 
-    expect(questions).toHaveLength(3);
+    const success = result.isRight();
 
-    expect(questions[0].createdAt).toEqual(new Date(2024, 11, 22));
+    expect(success).toBe(true);
+
+    if (success) {
+      expect(result.value.questions).toHaveLength(3);
+      expect(result.value.questions[0].createdAt).toEqual(
+        new Date(2024, 11, 22)
+      );
+    }
   });
 
   it("should be able to fetch paginated recent questions.", async () => {
@@ -44,11 +51,17 @@ describe("Fetch recent questions use case", () => {
       await inMemoryQuestionsRepository.create(makeQuestion());
     }
 
-    const { questions } = await sut.execute({
+    const result = await sut.execute({
       page: 2,
     });
 
-    expect(questions).toHaveLength(3);
+    const success = result.isRight();
+
+    expect(success).toBe(true);
+
+    if (success) {
+      expect(result.value.questions).toHaveLength(3);
+    }
   });
 });
 

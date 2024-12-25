@@ -31,12 +31,14 @@ describe("Fetch question answers use case", () => {
       })
     );
 
-    const { answers } = await sut.execute({
+    const result = await sut.execute({
       questionId: "test-question-id",
       page: 1,
     });
 
-    expect(answers).toHaveLength(3);
+    const success = result.isRight();
+    expect(success).toBe(true);
+    if (success) expect(result.value.answers).toHaveLength(3);
   });
 
   it("should be able to fetch paginated recent questions.", async () => {
@@ -48,12 +50,14 @@ describe("Fetch question answers use case", () => {
       );
     }
 
-    const { answers } = await sut.execute({
+    const result = await sut.execute({
       questionId: "test-question-id",
       page: 2,
     });
 
-    expect(answers).toHaveLength(3);
+    const success = result.isRight();
+    expect(success).toBe(true);
+    if (success) expect(result.value.answers).toHaveLength(3);
   });
 });
 

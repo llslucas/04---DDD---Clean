@@ -1,4 +1,3 @@
-import { UniqueEntityId } from "@/core/entities/unique-entity-id";
 import { AnswerQuestionUseCase } from "./answer-question";
 import { InMemoryAnswersRepository } from "test/repositories/in-memory-answers-repository";
 
@@ -12,19 +11,18 @@ describe("Answer question use case", () => {
   });
 
   it("should be able to create a new answer", async () => {
-    const { answer } = await sut.execute({
+    const result = await sut.execute({
       authorId: "author-test",
       questionId: "question-test",
       content: "Testing answer creation.",
     });
 
-    expect(answer.props).toEqual(
-      expect.objectContaining({
-        authorId: new UniqueEntityId("author-test"),
-        questionId: new UniqueEntityId("question-test"),
-        content: "Testing answer creation.",
-      })
-    );
+    const success = result.isRight();
+
+    expect(success).toBe(true);
+    if (success) {
+      expect(result.value?.answer).toEqual(inMemoryAnswersRepository.items[0]);
+    }
   });
 });
 
