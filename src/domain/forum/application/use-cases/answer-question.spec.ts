@@ -15,13 +15,17 @@ describe("Answer question use case", () => {
       authorId: "author-test",
       questionId: "question-test",
       content: "Testing answer creation.",
+      attachmentIds: ["1", "2"],
     });
 
     const success = result.isRight();
 
     expect(success).toBe(true);
+
     if (success) {
-      expect(result.value?.answer).toEqual(inMemoryAnswersRepository.items[0]);
+      const answerOnRepository = inMemoryAnswersRepository.items[0];
+
+      expect(answerOnRepository).toEqual(result.value.answer);
     }
   });
 });

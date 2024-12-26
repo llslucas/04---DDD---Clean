@@ -1,3 +1,4 @@
+import { UniqueEntityId } from "@/core/entities/unique-entity-id";
 import { CreateQuestionUseCase } from "./create-question";
 import { InMemoryQuestionsRepository } from "test/repositories/in-memory-questions-repository";
 
@@ -15,6 +16,7 @@ describe("Create question use case", () => {
       authorId: "1",
       title: "Testing Question",
       content: "Question content",
+      attachmentIds: ["1", "2"],
     });
 
     const success = result.isRight();
@@ -22,9 +24,14 @@ describe("Create question use case", () => {
     expect(success).toBe(true);
 
     if (success) {
-      expect(result.value.question).toEqual(
-        inMemoryQuestionsRepository.items[0]
-      );
+      const repositoryQuestion = inMemoryQuestionsRepository.items[0];
+
+      expect(repositoryQuestion).toEqual(result.value.question);
+      expect(repositoryQuestion.attachments).toHaveLength(2);
+      expect(repositoryQuestion.attachments).toEqual([
+        expect.objectContaining({ attachmentId: new UniqueEntityId("1") }),
+        expect.objectContaining({ attachmentId: new UniqueEntityId("2") }),
+      ]);
     }
   });
 });
