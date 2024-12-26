@@ -3,14 +3,25 @@ import { InMemoryAnswersRepository } from "test/repositories/in-memory-answers-r
 import { EditAnswerUseCase } from "./edit-answer";
 import { UniqueEntityId } from "@/core/entities/unique-entity-id";
 import { NotAllowedError } from "./errors/not-allowed-error";
+import { InMemoryAnswerAttachmentsRepository } from "test/repositories/in-memory-answer-attachments-repository";
 
+let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository;
 let inMemoryAnswersRepository: InMemoryAnswersRepository;
 let sut: EditAnswerUseCase;
 
 describe("Edit answer use case", () => {
   beforeEach(async () => {
-    inMemoryAnswersRepository = new InMemoryAnswersRepository();
-    sut = new EditAnswerUseCase(inMemoryAnswersRepository);
+    inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository();
+
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentsRepository
+    );
+
+    sut = new EditAnswerUseCase(
+      inMemoryAnswersRepository,
+      inMemoryAnswerAttachmentsRepository
+    );
   });
 
   it("should be able to edit a answer.", async () => {
@@ -24,6 +35,7 @@ describe("Edit answer use case", () => {
       answerId: id.toString(),
       authorId: "test-author",
       content: "new test content",
+      attachmentIds: ["1", "3"],
     });
 
     const success = result.isRight();
@@ -31,7 +43,12 @@ describe("Edit answer use case", () => {
     expect(success).toBe(true);
 
     if (success) {
-      expect(inMemoryAnswersRepository.items[0]).toEqual(result.value.answer);
+      expect(result.value.answer).toEqual(inMemoryAnswersRepository.items[0]);
+      expect(result.value.answer.attachments.getItems()).toHaveLength(2);
+      expect(result.value.answer.attachments.getItems()).toEqual([
+        expect.objectContaining({ attachmentId: new UniqueEntityId("1") }),
+        expect.objectContaining({ attachmentId: new UniqueEntityId("3") }),
+      ]);
     }
   });
 
@@ -44,6 +61,7 @@ describe("Edit answer use case", () => {
       answerId: id.toString(),
       authorId: "test-author",
       content: "new test content",
+      attachmentIds: [],
     });
 
     const error = result.isLeft();

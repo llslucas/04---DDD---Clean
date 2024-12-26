@@ -4,7 +4,7 @@ export class Entity<Props> {
   private readonly _id: UniqueEntityId;
   protected _props: Props;
 
-  constructor(public props: Props, id?: UniqueEntityId) {
+  protected constructor(public props: Props, id?: UniqueEntityId) {
     this._id = id ?? new UniqueEntityId();
     this._props = props;
   }

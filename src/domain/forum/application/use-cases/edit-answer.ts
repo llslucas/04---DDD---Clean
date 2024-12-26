@@ -1,13 +1,18 @@
+import { AnswersRepository } from "../repositories/answers-repository";
+import { AnswerAttachmentsRepository } from "../repositories/answer-attachments-repository";
 import { Either, left, right } from "@/core/either";
 import { Answer } from "../../enterprise/entities/answer";
-import { AnswersRepository } from "../repositories/answers-repository";
 import { NotAllowedError } from "./errors/not-allowed-error";
 import { ResourceNotFoundError } from "./errors/resource-not-found-error";
+import { AnswerAttachment } from "../../enterprise/entities/answer-attachment";
+import { UniqueEntityId } from "@/core/entities/unique-entity-id";
+import { AnswerAttachmentList } from "../../enterprise/entities/answer-attachment-list";
 
 interface EditAnswerUseCaseRequest {
   answerId: string;
   authorId: string;
   content: string;
+  attachmentIds: string[];
 }
 
 type EditAnswerUseCaseResponse = Either<
@@ -18,14 +23,18 @@ type EditAnswerUseCaseResponse = Either<
 >;
 
 export class EditAnswerUseCase {
-  constructor(private repository: AnswersRepository) {}
+  constructor(
+    private answersRepository: AnswersRepository,
+    private answerAttachmentsRepository: AnswerAttachmentsRepository
+  ) {}
 
   async execute({
     answerId,
     authorId,
     content,
+    attachmentIds,
   }: EditAnswerUseCaseRequest): Promise<EditAnswerUseCaseResponse> {
-    const answer = await this.repository.findById(answerId);
+    const answer = await this.answersRepository.findById(answerId);
 
     if (!answer) {
       return left(new ResourceNotFoundError());
@@ -35,9 +44,28 @@ export class EditAnswerUseCase {
       return left(new NotAllowedError());
     }
 
-    answer.content = content;
+    const currentAnswerAttachments =
+      await this.answerAttachmentsRepository.findManyByAnswerId(
+        answer.id.toString()
+      );
 
-    await this.repository.save(answer);
+    const newAnswerAttachments = attachmentIds.map((attachmentId) => {
+      return AnswerAttachment.create({
+        attachmentId: new UniqueEntityId(attachmentId),
+        answerId: answer.id,
+      });
+    });
+
+    const answerAttachmentList = new AnswerAttachmentList(
+      currentAnswerAttachments
+    );
+
+    answerAttachmentList.update(newAnswerAttachments);
+
+    answer.content = content;
+    answer.attachments = answerAttachmentList;
+
+    await this.answersRepository.save(answer);
 
     return right({ answer });
   }

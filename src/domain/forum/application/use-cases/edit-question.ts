@@ -5,7 +5,7 @@ import { NotAllowedError } from "./errors/not-allowed-error";
 import { ResourceNotFoundError } from "./errors/resource-not-found-error";
 import { QuestionAttachment } from "../../enterprise/entities/question-attachment";
 import { UniqueEntityId } from "@/core/entities/unique-entity-id";
-import { QuestionAttachmentList } from "../../enterprise/entities/question-attachments-list";
+import { QuestionAttachmentList } from "../../enterprise/entities/question-attachment-list";
 import { QuestionAttachmentsRepository } from "../repositories/question-attachments-repository";
 
 interface EditQuestionUseCaseRequest {
@@ -52,7 +52,7 @@ export class EditQuestionUseCase {
       );
 
     const newQuestionAttachments = attachmentIds.map((attachmentId) => {
-      return new QuestionAttachment({
+      return QuestionAttachment.create({
         attachmentId: new UniqueEntityId(attachmentId),
         questionId: question.id,
       });
