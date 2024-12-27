@@ -1,4 +1,4 @@
-import { DomainEvents } from "@/core/events/domain.events";
+import { DomainEvents } from "@/core/events/domain-events";
 import { PaginationParams } from "@/core/repositories/pagination-params";
 import { AnswerAttachmentsRepository } from "@/domain/forum/application/repositories/answer-attachments-repository";
 import { AnswersRepository } from "@/domain/forum/application/repositories/answers-repository";
@@ -44,7 +44,7 @@ export class InMemoryAnswersRepository implements AnswersRepository {
   async save(answer: Answer): Promise<void> {
     const index = this.items.findIndex((item) => {
       return item.id === answer.id;
-    });
+    }); 
 
     this.items[index] = answer;
 

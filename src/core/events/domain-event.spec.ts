@@ -2,7 +2,7 @@ import { DomainEvent } from "../events/domain-event";
 import { UniqueEntityId } from "../entities/unique-entity-id";
 import { AggregateRoot } from "../entities/aggregate-root";
 import { vi } from "vitest";
-import { DomainEvents } from "./domain.events";
+import { DomainEvents } from "./domain-events";
 
 class CustomAggregateCreated implements DomainEvent {
   public ocurredAt: Date;
